@@ -9,6 +9,18 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 
+class Hike {
+    constructor(name, distance, difficulty, elevation_gain, website) {
+        this.name = name,
+            this.distane = distance,
+            this.difficulty = difficulty,
+            this.elevation_gain = elevation_gain,
+            this.website = website
+    }
+
+
+}
+
 
 function homeButton(status) {
     document.getElementById("home").style.visibility = status;
@@ -20,6 +32,18 @@ function locationButton(status) {
 
 function newHikeButton(status) {
     document.getElementById("new-hike").style.visibility = status;
+}
+
+function fetchLocations() {
+    fetch(LOCATIONS_URL)
+        .then(resp => resp.json())
+        .then(populateLocationDropdown)
+}
+
+function populateLocationDropdown(data) {
+    let select = document.getElementById('location-dropdown')
+    let option = document.createElement('option')
+    data.f
 }
 
 function sortHike(obj) {
@@ -85,9 +109,13 @@ function displayForm() {
     <p><label>Difficulty:</label></p>
     <input type="text" id="difficulty">
     <p><label>Distance:</label></p>
-    <input type="text" id="distance">
+    <input type="number" id="distance">
     <p><label>Elevation Gain:</label></p>
-    <input type="text" id="elevation_gain">
+    <input type="number" id="elevation_gain">
+    <p><label>Location:</label></p>
+    <select id="location-dropdown" name="cars">
+        <option value="">Select a location</option>
+    </select>
     <p><label>Website:</label></p>
     <input type="text" id="website">
     <p><input type="submit" value="Add Hike"></p>
@@ -98,7 +126,7 @@ function displayForm() {
 
 function createHike() {
     event.preventDefault()
-    const hike = {
+    const newHike = {
         name: document.getElementById("name").value,
         difficulty: document.getElementById('difficulty').value,
         distance: document.getElementById('distance').value,
@@ -106,6 +134,21 @@ function createHike() {
         location: document.getElementById('location').value,
         website: document.getElementById('website').value
     }
+
+    fetch(HIKES_URL, {
+        method: "POST",
+        body: JSON.stringify(newHike),
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+    })
+        .then(resp => resp.json())
+        .then(hike => {
+            document.querySelector("#list").innerHTML += `<li>
+            <a href="#" data-id="${hike.id}">${hike.name}</a>
+            </li>`
+        })
 }
 
 function showHike() {
