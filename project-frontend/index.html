@@ -8,8 +8,28 @@
 
 
 <body>
-    <h1>Hikes in Los Angeles</h1>
-    <div id="new-hike-form"></div>
+    <h1>Hikes in Southern California</h1>
+
+    <form id="new-hike-form">
+        <p><label>Name:</label>
+        <p>
+            <input type="text" id="name">
+        <p><label>Difficulty:</label></p>
+        <input type="text" id="difficulty">
+        <p><label>Distance:</label></p>
+        <input type="number" id="distance">
+        <p><label>Elevation Gain:</label></p>
+        <input type="number" id="elevation_gain">
+        <p><label>Location:</label></p>
+        <select id="location-dropdown">
+            <option value="" disabled selected>Select a location</option>
+        </select>
+        <p><label>Website:</label></p>
+        <input type="text" id="website">
+        <p><input type="submit" value="Add Hike"></p>
+    </form>
+
+
     <div id="main">
         <ul id="list"></ul>
     </div>

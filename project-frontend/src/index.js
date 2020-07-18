@@ -3,6 +3,7 @@ const HIKES_URL = BASE_URL + '/hikes'
 const LOCATIONS_URL = BASE_URL + '/locations'
 const body = document.body
 const list = document.getElementById("list")
+const select = document.querySelector("select#location-dropdown")
 
 document.addEventListener("DOMContentLoaded", () => {
     getHikes()
@@ -10,17 +11,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 class Hike {
-    constructor(name, distance, difficulty, elevation_gain, website) {
+    constructor(name, distance, difficulty, elevation_gain, website, location_id) {
         this.name = name,
-            this.distane = distance,
+            this.distance = distance,
             this.difficulty = difficulty,
             this.elevation_gain = elevation_gain,
-            this.website = website
+            this.website = website,
+            this.location_id = location_id
     }
+
 
 
 }
 
+function formVisibility(status) {
+    const form = document.getElementById("new-hike-form").style.display = status;
+}
 
 function homeButton(status) {
     document.getElementById("home").style.visibility = status;
@@ -41,9 +47,26 @@ function fetchLocations() {
 }
 
 function populateLocationDropdown(data) {
-    let select = document.getElementById('location-dropdown')
-    let option = document.createElement('option')
-    data.f
+    let sorted = sortLocation(data)
+    for (let location of sorted) {
+        let option = document.createElement('option')
+        option.innerHTML = location.county
+        option.value = location.id
+        select.appendChild(option)
+    }
+
+    [].slice.call(select.options)
+        .map(function (a) {
+            if (this[a.innerText]) {
+                select.removeChild(a);
+            } else {
+                this[a.innerText] = 1;
+            }
+        }, {});
+}
+
+function toggleDropdown() {
+    fetchLocations()
 }
 
 function sortHike(obj) {
@@ -78,7 +101,8 @@ function getHikes() {
     homeButton("hidden")
     locationButton("visible")
     newHikeButton("visible")
-    clearForm()
+    formVisibility("none")
+    // clearForm()
     return getList(HIKES_URL, sortHike, listHike)
 }
 
@@ -90,54 +114,45 @@ function attachClickToLinks() {
     document.getElementById("new-hike").addEventListener('click', displayForm)
     document.getElementById("locations").addEventListener('click', getLocations)
     document.getElementById("home").addEventListener('click', getHikes)
+    document.querySelector("form select#location-dropdown").addEventListener('click', toggleDropdown)
+    document.querySelector("form").addEventListener("submit", createHike)
 }
 
-function clearForm() {
-    let formDiv = document.getElementById("new-hike-form")
-    return formDiv.innerHTML = ""
-}
+// function clearForm() {
+//     let formDiv = document.getElementById("new-hike-form")
+//     return formDiv.innerHTML = ""
+// }
 
 function displayForm() {
     list.innerHTML = ""
     homeButton("visible")
     locationButton("visible")
     newHikeButton("hidden")
-    let form = document.getElementById("new-hike-form")
-    form.innerHTML += ` <form>
-    <p><label>Name:</label><p>
-    <input type="text" id="name">
-    <p><label>Difficulty:</label></p>
-    <input type="text" id="difficulty">
-    <p><label>Distance:</label></p>
-    <input type="number" id="distance">
-    <p><label>Elevation Gain:</label></p>
-    <input type="number" id="elevation_gain">
-    <p><label>Location:</label></p>
-    <select id="location-dropdown" name="cars">
-        <option value="">Select a location</option>
-    </select>
-    <p><label>Website:</label></p>
-    <input type="text" id="website">
-    <p><input type="submit" value="Add Hike"></p>
-    </form
-    `
-    document.querySelector('form').addEventListener('submit', createHike)
+    formVisibility("block")
+    // document.querySelector('form').addEventListener('submit', createHike)
 }
 
 function createHike() {
     event.preventDefault()
-    const newHike = {
-        name: document.getElementById("name").value,
-        difficulty: document.getElementById('difficulty').value,
-        distance: document.getElementById('distance').value,
-        elevation_gain: document.getElementById('elevation_gain').value,
-        location: document.getElementById('location').value,
-        website: document.getElementById('website').value
-    }
+
+    const newHike = new Hike(document.getElementById("name").value,
+        document.getElementById('distance').value,
+        document.getElementById('difficulty').value,
+        document.getElementById('elevation_gain').value,
+        document.getElementById('website').value,
+        select.value
+    )
 
     fetch(HIKES_URL, {
         method: "POST",
-        body: JSON.stringify(newHike),
+        body: JSON.stringify({
+            "name": newHike.name,
+            "difficulty": newHike.difficulty,
+            "distance": newHike.distance,
+            "elevation_gain": newHike.elevation_gain,
+            "website": newHike.website,
+            "location_id": newHike.location_id
+        }),
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/json"
@@ -145,7 +160,7 @@ function createHike() {
     })
         .then(resp => resp.json())
         .then(hike => {
-            document.querySelector("#list").innerHTML += `<li>
+            list.innerHTML += `<li>
             <a href="#" data-id="${hike.id}">${hike.name}</a>
             </li>`
         })
@@ -153,6 +168,23 @@ function createHike() {
 
 function showHike() {
     list.innerHTML = ""
+    homeButton("visible")
+    let id = event.target.dataset.id
+
+    fetch(HIKES_URL + "/" + id)
+        .then(resp => resp.json())
+        .then(obj => {
+            list.innerHTML = `<h1>${obj['name']}</h1 >
+                <p>Difficulty: ${obj.difficulty}</p>
+                <p>Distance: ${obj.distance} miles</p>
+                <p>Elevation Gain: ${obj.elevation_gain} feet</p>
+                <p>Location: ${obj.location.county} </p>
+                <a href="${obj.website}" target="_blank">More info</a>
+                    `
+        })
+}
+
+function deleteHike() {
 
 }
 
@@ -161,14 +193,15 @@ function getLocations() {
     homeButton("visible")
     locationButton("hidden")
     newHikeButton("visible")
-    clearForm()
+    formVisibility("none")
+    // clearForm()
     return getList(LOCATIONS_URL, sortLocation, listLocation)
 }
 
 function listLocation(location) {
     return `<li>
-    <a href="#" data-id="${location.id}">${location.county}</a>
-    </li>`
+                        <a href="#" data-id="${location.id}">${location.county}</a>
+                    </li>`
 }
 
 function showLocation() {
@@ -178,11 +211,3 @@ function showLocation() {
 function createLocation() {
 
 }
-// function listHikes(obj) {
-//     let newHike = createHike();
-//     let list = document.getElementById('list')
-//     obj.forEach(hike => {
-//         list += `<li>${hike.name}</li>`
-//     })
-//     return list;
-// }
