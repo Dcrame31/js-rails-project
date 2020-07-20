@@ -1,4 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;700&display=swap');
+
 #main {
-    border: .5px solid rgb(139, 132, 132);
     box-shadow: 5px 10px 3px rgba(0,0,0,.2);
+    margin: 40px;
+    padding: 30px;
+    background-color: #eee;
+}
+
+body {
+    /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; */
+    font-family: 'Quicksand', sans-serif;
+    background-color: #cfeaff;
+    background-image: url("https://www.transparenttextures.com/patterns/cartographer.png");
+}
+
+li {
+    list-style-type: none ;
+    cursor: pointer;
+    transition: font-size .3s;
+}
+
+li:hover {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: orange;
+    cursor: pointer;
+    transition: font-size .3s;
+}
+
+.button {
+    background-color: orange; 
+    border: 1px solid;
+    color: white;
+    padding: 10px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1em;
+}
+
+h1 {
+    font-size: 2em;
+    margin-left: 2em;
+    font-weight: 700;
 }

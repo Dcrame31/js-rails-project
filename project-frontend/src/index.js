@@ -129,6 +129,7 @@ function renderFooter(config = {}) {
         const id = name.replace(' ', '-').toLowerCase();
         const anchor = document.createElement('a');
 
+        anchor.className = "button"
         anchor.href = '#';
         anchor.innerText = name;
         anchor.addEventListener('click', handler);
@@ -148,8 +149,9 @@ async function renderHomePage() {
         })
 
     renderScreen(`
-        <select id="location-dropdown">
-            <option value="" selected>All locations</option>
+        <label for="location-dropdown">County:</label>
+        <select id="location-dropdown" name="location-dropdown">
+            <option value="" selected>All</option>
             ${countyOptions.join('')}
         </select>
         <ul id="list"></ul>
@@ -183,17 +185,17 @@ function renderHikesList(list, $listElement, locationId) {
         .sort(alphabeticalBy('name'))
         .forEach(({ name, id }) => {
             const listItem = document.createElement('li')
-            const anchor = document.createElement('a');
+            // const anchor = document.createElement('a');
 
-            anchor.innerText = name;
-            anchor.dataset.id = id;
-            anchor.href = '#';
-            anchor.addEventListener('click', (e) => {
+            listItem.innerText = name;
+            listItem.dataset.id = id;
+            // anchor.href = '#';
+            listItem.addEventListener('click', (e) => {
                 e.preventDefault();
                 renderHikeSummaryPage(id)
             });
 
-            listItem.appendChild(anchor);
+            // listItem.appendChild(anchor);
 
             $listElement.appendChild(listItem);
         });
