@@ -29,13 +29,13 @@ function alphabeticalBy(value) {
 }
 
 
-function sortHike(obj) {
-    return obj.sort(function (a, b) { return a.name > b.name ? 1 : -1 });
-}
+// function sortHike(obj) {
+//     return obj.sort(function (a, b) { return a.name > b.name ? 1 : -1 });
+// }
 
-function sortLocation(obj) {
-    return obj.sort(function (a, b) { return a.county > b.county ? 1 : -1 });
-}
+// function sortLocation(obj) {
+//     return obj.sort(function (a, b) { return a.county > b.county ? 1 : -1 });
+// }
 
 // function listLocation(location) {
 //     return `<li>
@@ -312,6 +312,11 @@ async function createHike(body = {
         }
     })
         .then(resp => resp.json())
+        .catch(err => {
+            err.text().then(errorMessage => {
+                this.props.dispatch(displayTheError(errorMessage))
+            })
+        })
 }
 
 async function updateHike(id, body = {
